@@ -73,8 +73,8 @@
                 </ListView.ItemTemplate>
             </ListView>
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                <Button Content="←" Background="Transparent" BorderBrush="Transparent"/>
-                <ListBox d:ItemsSource="{d:SampleData ItemCount=5}">
+                <Button Content="←" Background="Transparent" BorderBrush="Transparent" Click="MinusPage"/>
+                <ListBox x:Name="lvPages">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel/>
@@ -86,7 +86,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Content="→" Background="Transparent" BorderBrush="Transparent"/>
+                <Button Content="→" Background="Transparent" BorderBrush="Transparent" Click="PlusPage"/>
             </StackPanel>
         </Grid>
     </Grid>

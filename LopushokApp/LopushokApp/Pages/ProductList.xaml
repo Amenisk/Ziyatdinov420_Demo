@@ -16,13 +16,16 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="tbSearch" Margin="10" Grid.Column="0" Text="Введите для поиска" VerticalContentAlignment="Center"/>
-            <ComboBox x:Name="cbSort" Grid.Column="1" Margin="10" VerticalContentAlignment="Center" Text="Сортировка">
+            <TextBox x:Name="tbSearch" Margin="10" Grid.Column="0" VerticalContentAlignment="Center" TextChanged="tbSearch_TextChanged"/>
+            <ComboBox x:Name="cbSortItem" Grid.Column="1" Margin="10" VerticalContentAlignment="Center" Text="Сортировка" SelectionChanged="cbSortItem_SelectionChanged">
             </ComboBox>
-            <ComboBox x:Name="cbFilter" Grid.Column="2" Margin="10" VerticalContentAlignment="Center" Text="Фильтрация">
+            <ComboBox x:Name="cbSort" Grid.Column="2" Margin="10" VerticalContentAlignment="Center" Text="Сортировка" SelectionChanged="cbSort_SelectionChanged">
+            </ComboBox>
+            <ComboBox x:Name="cbFilter" Grid.Column="3" Margin="10" VerticalContentAlignment="Center" Text="Фильтрация" SelectionChanged="cbFilter_SelectionChanged" DisplayMemberPath="Name">
             </ComboBox>
         </Grid>
         <Grid Grid.Row="1">
@@ -73,8 +76,8 @@
                 </ListView.ItemTemplate>
             </ListView>
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                <Button Content="←" Background="Transparent" BorderBrush="Transparent" Click="MinusPage"/>
-                <ListBox x:Name="lvPages">
+                <Button Content="←" Background="Transparent" BorderBrush="Transparent" Click="PrevPageButton_Click"/>
+                <ListBox x:Name="lvPages" SelectionChanged="lvPages_SelectionChanged">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel/>
@@ -86,7 +89,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Content="→" Background="Transparent" BorderBrush="Transparent" Click="PlusPage"/>
+                <Button Content="→" Background="Transparent" BorderBrush="Transparent" Click="NextPageButton_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -21,44 +21,140 @@ namespace LopushokApp.Pages
     /// </summary>
     public partial class ProductList : Page
     {
-        int lastPage = 0;
+        private const int PageSize = 20;
+        private int CurrentPage = 0;
+        private int TotalCount;
+        private int PagesCount;
+        private string FilterName;
+        private string SearchFilter = "";
+        private string SortField;
+        private bool IsAsc = false;
+
         public ProductList()
         {
             InitializeComponent();
-            List<string> names = new List<string>();
-            for(int i = 1; i < App.Connection.Product.ToList().Count() / 20; i++)
-            {
-                names.Add(i.ToString());
-                lastPage = i;
-            }
+            var filters = new List<ProductType> { new ProductType { Name = "Все типы" } };
+            filters.AddRange(App.Connection.ProductType.ToList());
+            cbFilter.ItemsSource = filters;
+            cbFilter.SelectedIndex = 0;
 
-            if(App.Connection.Product.ToList().Count() % 20 != 0)
-            {
-                lastPage++;
-                names.Add(lastPage.ToString());
-            }
+            var sorts = new List<string> {
+                    "Без сортировки",
+                    "Наименование", "Номер производственного цеха ",
+                    "Минимальная стоимость для агента"};
+            cbSort.ItemsSource = sorts;
+            cbSort.SelectedIndex = 0;
 
-            lvPages.ItemsSource = names;
-            lvPages.SelectedIndex = 0;
-            lvProducts.ItemsSource = App.Connection.Product.ToList().Take(20);
+            cbSortItem.ItemsSource = new List<string> { "По убыванию", "По возрастанию" };
+            cbSortItem.SelectedIndex = 0;
+            UpdateSource();
         }
 
-        private void MinusPage(object sender, RoutedEventArgs e)
+        private void UpdateSource()
         {
-            if(lvPages.SelectedIndex != 0)
+            List<Product> products;
+            if (string.IsNullOrEmpty(FilterName) || FilterName == "Все типы")
             {
-                lvPages.SelectedIndex = --lvPages.SelectedIndex;
-                lvProducts.ItemsSource = App.Connection.Product.ToList().Skip(lvPages.SelectedIndex * 20).Take(20);
+                products = App.Connection.Product.ToList();
             }
+            else
+            {
+                products = App.Connection.Product.ToList().Where(x => x.ProductType.Name == FilterName).ToList();
+            }
+
+            products = products.Where(x => x.Name.ToLower().Contains(SearchFilter.ToLower())).ToList();
+
+            TotalCount = products.Count;
+            PagesCount = TotalCount / PageSize + (TotalCount % PageSize != 0 ? 1 : 0);
+            lvPages.ItemsSource = Enumerable.Range(0, PagesCount).Select(x => x + 1);
+
+            if (IsAsc)
+            {
+                if (SortField == "Наименование")
+                {
+                    products = products.OrderBy(x => x.Name).ToList();
+                }
+                else if (SortField == "Номер производственного цеха")
+                {
+                    products = products.OrderBy(x => x.FactoryNumber).ToList();
+                }
+                else
+                {
+                    products = products.OrderBy(x => x.MinCost).ToList();
+                }
+            }
+            else
+            {
+                if (SortField == "Наименование")
+                {
+                    products = products.OrderByDescending(x => x.Name).ToList();
+                }
+                else if (SortField == "Номер производственного цеха")
+                {
+                    products = products.OrderByDescending(x => x.FactoryNumber).ToList();
+                }
+                else
+                {
+                    products = products.OrderByDescending(x => x.MinCost).ToList();
+                }
+            }
+            lvProducts.ItemsSource = products.Skip(PageSize * CurrentPage).Take(PageSize);
         }
 
-        private void PlusPage(object sender, RoutedEventArgs e)
+        private void PrevPageButton_Click(object sender, RoutedEventArgs e)
         {
-            if (lvPages.SelectedIndex != lastPage - 1)
+            CurrentPage = Math.Max(0, CurrentPage - 1);
+            UpdateSource();
+        }
+
+        private void NextPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentPage = Math.Min(PagesCount - 1, CurrentPage + 1);
+            UpdateSource();
+        }
+
+        private void lvPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = ((ListBox)sender).SelectedItem;
+            var pageNumber = (int)listBox - 1;
+            CurrentPage = pageNumber;
+            UpdateSource();
+        }
+
+        private void cbSortItem_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var order = (string)((ComboBox)sender).SelectedItem;
+            if (order == "По возрастанию")
             {
-                lvPages.SelectedIndex = ++lvPages.SelectedIndex;
-                lvProducts.ItemsSource = App.Connection.Product.ToList().Skip(lvPages.SelectedIndex * 20).Take(20);
+                IsAsc = true;
             }
+            else
+            {
+                IsAsc = false;
+            }
+            UpdateSource();
+        }
+
+        private void cbSort_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SortField = (string)((ComboBox)sender).SelectedItem;
+            UpdateSource();
+        }
+
+        private void cbFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedItem = (ProductType)((ComboBox)sender).SelectedItem;
+            if (selectedItem == null)
+                return;
+            FilterName = selectedItem.Name;
+            UpdateSource();
+        }
+
+        private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var text = ((TextBox)sender).Text;
+            SearchFilter = text;
+            UpdateSource();
         }
     }
 }

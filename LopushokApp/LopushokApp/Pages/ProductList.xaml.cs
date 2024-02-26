@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LopushokApp.ADO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,8 @@ namespace LopushokApp.Pages
         public ProductList()
         {
             InitializeComponent();
+            lvProducts.ItemsSource = App.Connection.Product.ToList();
+            Product prod = new Product();
         }
     }
 }

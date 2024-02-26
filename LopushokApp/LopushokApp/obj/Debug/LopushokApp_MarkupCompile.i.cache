@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\kziat\OneDrive\Документы\Demo-4-2\LopushokApp\LopushokApp\App.xaml
-2-1360154136
+31705962299
 2-693156799
-16-1040684948
+17955120809
 18-1633234707
-MainWindow.xaml;Pages\ProductList.xaml;
+MainWindow.xaml;Pages\AddProductPage.xaml;Pages\ProductList.xaml;
 
-False
+True
 
